@@ -84,7 +84,7 @@ Set the LED color and brightness.
 | `"purple"`  | 128,0,128  | -           |
 | `"yellow"`  | 255,255,0  | -           |
 | `"orange"`  | 255,165,0  | -           |
-|-------------|------------|-------------|
+
 '
 ## Thread Safety
 
