@@ -1,6 +1,6 @@
 # Minimal RGB LED Library for the WS2812B
 
-The simplest, most lightweight WS2812B RGB LED library for Arduino-ESP32 version 3.3 and higher.  For single RGB control, this library _saves 76KB of program space_ compared to a very popular RGB LED control library.
+The simplest, most lightweight WS2812B RGB LED library for Arduino-ESP32 version 3.3 and higher.  For single RGB control, this library **saves 76KB of program space** compared to a very popular RGB LED control library.
 
 ## Features
 
