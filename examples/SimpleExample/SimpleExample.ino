@@ -31,44 +31,105 @@ void setup() {
 
 void loop() {
   // Cycle through colors with different brightness levels
-  
-  Serial.println("Red - Full brightness");
-  led.set("red", 255);
+  Serial.println("Red");
+  led.set("red");
   delay(1000);
-  
-  Serial.println("Green - Full brightness");
-  led.set("green", 255);
+
+  for(int i=1;i<180;i++){
+    led.set("red", i);
+    delay(20);
+  }
+
+  for(int i=180;i>0;i--){
+    led.set("red", i);
+    delay(20);
+  }
+
+  Serial.println("Green");
+  led.set("green");
   delay(1000);
-  
-  Serial.println("Blue - Full brightness");
-  led.set("blue", 255);
+
+  for(int i=1;i<180;i++){
+    led.set("green", i);
+    delay(20);
+  }
+
+  for(int i=180;i>0;i--){
+    led.set("green", i);
+    delay(20);
+  }
+
+  Serial.println("Blue");
+  led.set("blue");
   delay(1000);
-  
-  Serial.println("Purple - Full brightness");
-  led.set("purple", 255);
+
+  for(int i=1;i<180;i++){
+    led.set("blue", i);
+    delay(20);
+  }
+
+  for(int i=180;i>0;i--){
+    led.set("blue", i);
+    delay(20);
+  }
+
+  Serial.println("Orange");
+  led.set("orange");
   delay(1000);
-  
-  Serial.println("Yellow - Full brightness");
-  led.set("yellow", 255);
+
+  for(int i=1;i<180;i++){
+    led.set("orange", i);
+    delay(20);
+  }
+
+  for(int i=180;i>0;i--){
+    led.set("orange", i);
+    delay(20);
+  }
+
+  Serial.println("Purple");
+  led.set("purple");
   delay(1000);
-  
-  Serial.println("Orange - Full brightness");
-  led.set("orange", 255);
+
+  for(int i=1;i<180;i++){
+    led.set("purple", i);
+    delay(20);
+  }
+
+  for(int i=180;i>0;i--){
+    led.set("purple", i);
+    delay(20);
+  }
+
+  Serial.println("Yellow");
+  led.set("yellow");
   delay(1000);
-  
-  Serial.println("White - Full brightness");
-  led.set("white", 255);
+
+  for(int i=1;i<180;i++){
+    led.set("yellow", i);
+    delay(20);
+  }
+
+  for(int i=180;i>0;i--){
+    led.set("yellow", i);
+    delay(20);
+  }
+
+  Serial.println("White");
+  led.set("white");
   delay(1000);
-  
-  Serial.println("White - 50% brightness");
-  led.set("white", 128);
-  delay(1000);
-  
-  Serial.println("White - 10% brightness");
-  led.set("white", 25);
-  delay(1000);
-  
+
+  for(int i=1;i<180;i++){
+    led.set("white", i);
+    delay(20);
+  }
+
+  for(int i=180;i>0;i--){
+    led.set("white", i);
+    delay(20);
+  }
+
   Serial.println("Off (black)");
   led.set("black");
-  delay(1000);
+  delay(2000);
 }
