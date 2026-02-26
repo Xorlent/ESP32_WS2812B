@@ -1,5 +1,5 @@
 /**
- * ESP32_WS2812B - A simple library for controlling WS2812B LED strips using ESP32's RMT peripheral.
+ * ESP32_WS2812B - A simple library for controlling WS2812B LEDs using ESP32's RMT peripheral.
  * 
  * Copyright (c) 2026 Xorlent
  * Licensed under the MIT License.

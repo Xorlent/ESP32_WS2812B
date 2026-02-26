@@ -1,5 +1,5 @@
 /**
- * ESP32_WS2812B - A simple library for controlling WS2812B LED strips using ESP32's RMT peripheral.
+ * ESP32_WS2812B - A simple library for controlling WS2812B LEDs using ESP32's RMT peripheral.
  * 
  * Copyright (c) 2026 Xorlent
  * Licensed under the MIT License.
@@ -10,14 +10,12 @@
 #include "WS2812B.h"
 #include <driver/rmt_tx.h>
 #include <string.h>
-#include <rom/ets_sys.h>  // For ets_delay_us()
 
 // WS2812B timing (in RMT ticks, 1 tick = 12.5ns at 80MHz)
 #define WS2812B_T0H_TICKS 24    // 0 code, high level time (300ns / 12.5ns ≈ 24)
-#define WS2812B_T0L_TICKS 104   // 0 code, low level time (1300ns / 12.5ns ≈ 104)
-#define WS2812B_T1H_TICKS 104   // 1 code, high level time (1300ns / 12.5ns ≈ 104)
+#define WS2812B_T0L_TICKS 80    // 0 code, low level time (1000ns / 12.5ns ≈ 80)
+#define WS2812B_T1H_TICKS 80   // 1 code, high level time (1000ns / 12.5ns ≈ 80)
 #define WS2812B_T1L_TICKS 24    // 1 code, low level time (300ns / 12.5ns ≈ 24)
-#define WS2812B_RESET_US 300    // Reset time in microseconds
 
 // Custom RMT encoder for WS2812B
 typedef struct {
@@ -137,9 +135,9 @@ static esp_err_t rmt_new_led_strip_encoder(rmt_encoder_handle_t *ret_encoder) {
         return ESP_FAIL;
     }
     
-    // WS2812B reset code (low for >50us)
+    // WS2812B reset code (low for 200us)
     led_encoder->reset_code.level0 = 0;
-    led_encoder->reset_code.duration0 = 4000; // 50us = 4000 ticks
+    led_encoder->reset_code.duration0 = 16000; // 200us = 16000 ticks
     led_encoder->reset_code.level1 = 0;
     led_encoder->reset_code.duration1 = 0;
     led_encoder->state = RMT_ENCODING_RESET;
@@ -192,7 +190,7 @@ bool WS2812B::begin(uint8_t pin) {
     tx_chan_config.clk_src = RMT_CLK_SRC_DEFAULT;
     tx_chan_config.resolution_hz = 80000000; // 80MHz resolution = 12.5ns per tick
     tx_chan_config.mem_block_symbols = 64;
-    tx_chan_config.trans_queue_depth = 4;
+    tx_chan_config.trans_queue_depth = 1;
     
     if (rmt_new_tx_channel(&tx_chan_config, &rmt_channel) != ESP_OK) {
         rmt_channel = nullptr;
@@ -260,10 +258,10 @@ void WS2812B::set(const char* color, uint8_t brightness) {
         r = 128; b = 128;
         applyBrightness(r, g, b, brightness);
     } else if (strcmp(color, "yellow") == 0) {
-        r = 255; g = 255;
+        r = 255; g = 150;
         applyBrightness(r, g, b, brightness);
     } else if (strcmp(color, "orange") == 0) {
-        r = 255; g = 165;
+        r = 255; g = 75;
         applyBrightness(r, g, b, brightness);
     }
     
@@ -282,8 +280,5 @@ void WS2812B::sendData(uint8_t r, uint8_t g, uint8_t b) {
     rmt_transmit(rmt_channel, led_encoder, led_data, sizeof(led_data), &tx_config);
     
     // Wait for transmission to complete to ensure sequential color changes
-    rmt_tx_wait_all_done(rmt_channel, 50);
-    
-    // Wait for WS2812B reset time (300us) to ensure LED is ready for next command
-    ets_delay_us(WS2812B_RESET_US);
+    rmt_tx_wait_all_done(rmt_channel, 10);
 }
