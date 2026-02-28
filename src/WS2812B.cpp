@@ -255,11 +255,14 @@ void WS2812B::set(const char* color, uint8_t brightness) {
         return;
     }
     
-    // Apply brightness adjustment
-    if (brightness != 0u && brightness != 255u) {
-        r = (r * brightness) / 255u;
-        g = (g * brightness) / 255u;
-        b = (b * brightness) / 255u;
+    // Apply brightness scaling
+    if (brightness == 0u) {
+        sendData(0, 0, 0);  // Skip math entirely
+        return;
+    } else if (brightness < 255u) {
+        r = ((r * brightness) + 128) >> 8;
+        g = ((g * brightness) + 128) >> 8;
+        b = ((b * brightness) + 128) >> 8;
     }
     
     sendData(r, g, b);
