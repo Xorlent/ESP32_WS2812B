@@ -223,9 +223,6 @@ bool WS2812B::begin(uint8_t pin) {
 }
 
 void WS2812B::applyBrightness(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t brightness) {
-    if (brightness == 0 || brightness == 255) {
-        return; // No adjustment needed
-    }
     r = (r * brightness) / 255;
     g = (g * brightness) / 255;
     b = (b * brightness) / 255;
