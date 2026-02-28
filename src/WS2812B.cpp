@@ -9,6 +9,8 @@
 
 #include "WS2812B.h"
 #include <driver/rmt_tx.h>
+#include <esp_timer.h>
+#include <esp_rom_sys.h>
 #include <string.h>
 
 // WS2812B timing (in RMT ticks, 1 tick = 12.5ns at 80MHz)
@@ -135,9 +137,9 @@ static esp_err_t rmt_new_led_strip_encoder(rmt_encoder_handle_t *ret_encoder) {
         return ESP_FAIL;
     }
     
-    // WS2812B reset code (low for 200us)
+    // WS2812B reset code (minimal - actual holdoff handled in sendData)
     led_encoder->reset_code.level0 = 0;
-    led_encoder->reset_code.duration0 = 16000; // 200us = 16000 ticks
+    led_encoder->reset_code.duration0 = 80; // Minimal reset pulse
     led_encoder->reset_code.level1 = 0;
     led_encoder->reset_code.duration1 = 0;
     led_encoder->state = RMT_ENCODING_RESET;
@@ -146,7 +148,7 @@ static esp_err_t rmt_new_led_strip_encoder(rmt_encoder_handle_t *ret_encoder) {
     return ESP_OK;
 }
 
-WS2812B::WS2812B() : rmt_channel(nullptr), led_encoder(nullptr), initialized(false) {
+WS2812B::WS2812B() : rmt_channel(nullptr), led_encoder(nullptr), initialized(false), last_transmit_us(0) {
     memset(&tx_config, 0, sizeof(tx_config));
 }
 
@@ -273,12 +275,27 @@ void WS2812B::sendData(uint8_t r, uint8_t g, uint8_t b) {
         return;
     }
     
+    // WS2812B requires 250us holdoff between transmissions
+    // Only wait if we're transmitting again before the holdoff period completes
+    const int64_t HOLDOFF_US = 250;
+    int64_t current_time_us = esp_timer_get_time();
+    int64_t elapsed_us = current_time_us - last_transmit_us;
+    
+    if (last_transmit_us > 0 && elapsed_us >= 0 && elapsed_us < HOLDOFF_US) {
+        // Wait only the remaining required time
+        int64_t remaining_us = HOLDOFF_US - elapsed_us;
+        esp_rom_delay_us((uint32_t)remaining_us);
+    }
+    
     // WS2812B expects GRB order
     uint8_t led_data[3] = {g, r, b};
     
     // Transmit data via RMT (blocks until queued, copies data internally)
     rmt_transmit(rmt_channel, led_encoder, led_data, sizeof(led_data), &tx_config);
     
-    // Wait for transmission to complete to ensure sequential color changes
-    rmt_tx_wait_all_done(rmt_channel, 10);
+    // Wait for transmission to complete
+    rmt_tx_wait_all_done(rmt_channel, 1);
+    
+    // Store completion timestamp for next transmission
+    last_transmit_us = esp_timer_get_time();
 }

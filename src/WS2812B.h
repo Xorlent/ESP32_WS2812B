@@ -30,6 +30,7 @@ private:
     rmt_encoder_handle_t led_encoder;
     rmt_transmit_config_t tx_config;
     bool initialized;
+    int64_t last_transmit_us;  // Timestamp of last transmission completion
     
     void sendData(uint8_t r, uint8_t g, uint8_t b);
     void applyBrightness(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t brightness);
