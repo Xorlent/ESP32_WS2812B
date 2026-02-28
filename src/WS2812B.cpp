@@ -241,38 +241,33 @@ void WS2812B::set(const char* color, uint8_t brightness) {
     // Use character checking for efficiency
     char first = color[0];
     
-    if (first == 'b') {
-        if (color[2] == 'u') {  // "blue"
-            b = 255;
-        } else {  // "black" or unrecognized 'b' color
-            sendData(0, 0, 0);
-            return;
-        }
-    } else if (first == 'B') {  // "B"
-        b = 255;
-    } else if (first == 'w') {  // "white"
-        r = g = b = 255;
-    } else if (first == 'r' || first == 'R') {  // "red" or "R"
-        r = 255;
+    if (first == 'r' || first == 'R') {  // "red" or "R"
+        r = 255u;
     } else if (first == 'g' || first == 'G') {  // "green" or "G"
-        g = 255;
+        g = 255u;
+    } else if (first == 'B' || (color[1] == 'l' && color[2] == 'u')) {  // "B" or "blue"
+        b = 255u;
     } else if (first == 'p') {  // "purple"
-        r = 128;
-        b = 128;
+        r = 128u;
+        b = 128u;
     } else if (first == 'y') {  // "yellow"
-        r = 255;
-        g = 150;
+        r = 255u;
+        g = 150u;
     } else if (first == 'o') {  // "orange"
-        r = 255;
-        g = 75;
+        r = 255u;
+        g = 75u;
+    } else if (first == 'w') {  // "white"
+        r = g = b = 255u;
     } else {
-        // Unrecognized color - default to black
-        sendData(0, 0, 0);
+        // Unrecognized color or black
+        sendData(0u, 0u, 0u);
         return;
     }
     
     // Apply brightness adjustment
-    applyBrightness(r, g, b, brightness);
+    if (brightness != 0u && brightness != 255u) {
+        applyBrightness(r, g, b, brightness);
+    }
     
     sendData(r, g, b);
 }
