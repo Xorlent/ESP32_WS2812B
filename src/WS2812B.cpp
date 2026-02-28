@@ -11,7 +11,6 @@
 #include <driver/rmt_tx.h>
 #include <esp_timer.h>
 #include <esp_rom_sys.h>
-#include <string.h>
 
 // WS2812B timing (in RMT ticks, 1 tick = 12.5ns at 80MHz)
 #define WS2812B_T0H_TICKS 24    // 0 code, high level time (300ns / 12.5ns ≈ 24)
@@ -148,8 +147,7 @@ static esp_err_t rmt_new_led_strip_encoder(rmt_encoder_handle_t *ret_encoder) {
     return ESP_OK;
 }
 
-WS2812B::WS2812B() : rmt_channel(nullptr), led_encoder(nullptr), initialized(false), last_transmit_us(0) {
-    memset(&tx_config, 0, sizeof(tx_config));
+WS2812B::WS2812B() : rmt_channel(nullptr), led_encoder(nullptr), initialized(false), last_transmit_us(0), tx_config{} {
 }
 
 WS2812B::~WS2812B() {
@@ -240,32 +238,41 @@ void WS2812B::set(const char* color, uint8_t brightness) {
     
     uint8_t r = 0, g = 0, b = 0;
     
-    // Parse color string
-    if (strcmp(color, "black") == 0) {
-        // All zeros (off) - ignore brightness
-        r = g = b = 0;
-    } else if (strcmp(color, "white") == 0) {
-        r = g = b = 255;
-        applyBrightness(r, g, b, brightness);
-    } else if (strcmp(color, "red") == 0 || strcmp(color, "R") == 0) {
-        r = 255;
-        applyBrightness(r, g, b, brightness);
-    } else if (strcmp(color, "green") == 0 || strcmp(color, "G") == 0) {
-        g = 255;
-        applyBrightness(r, g, b, brightness);
-    } else if (strcmp(color, "blue") == 0 || strcmp(color, "B") == 0) {
+    // Use character checking for efficiency
+    char first = color[0];
+    
+    if (first == 'b') {
+        if (color[2] == 'u') {  // "blue"
+            b = 255;
+        } else {  // "black" or unrecognized 'b' color
+            sendData(0, 0, 0);
+            return;
+        }
+    } else if (first == 'B') {  // "B"
         b = 255;
-        applyBrightness(r, g, b, brightness);
-    } else if (strcmp(color, "purple") == 0) {
-        r = 128; b = 128;
-        applyBrightness(r, g, b, brightness);
-    } else if (strcmp(color, "yellow") == 0) {
-        r = 255; g = 150;
-        applyBrightness(r, g, b, brightness);
-    } else if (strcmp(color, "orange") == 0) {
-        r = 255; g = 75;
-        applyBrightness(r, g, b, brightness);
+    } else if (first == 'w') {  // "white"
+        r = g = b = 255;
+    } else if (first == 'r' || first == 'R') {  // "red" or "R"
+        r = 255;
+    } else if (first == 'g' || first == 'G') {  // "green" or "G"
+        g = 255;
+    } else if (first == 'p') {  // "purple"
+        r = 128;
+        b = 128;
+    } else if (first == 'y') {  // "yellow"
+        r = 255;
+        g = 150;
+    } else if (first == 'o') {  // "orange"
+        r = 255;
+        g = 75;
+    } else {
+        // Unrecognized color - default to black
+        sendData(0, 0, 0);
+        return;
     }
+    
+    // Apply brightness adjustment
+    applyBrightness(r, g, b, brightness);
     
     sendData(r, g, b);
 }
