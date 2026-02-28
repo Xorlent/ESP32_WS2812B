@@ -4,7 +4,7 @@ The simplest, most lightweight WS2812B RGB LED library for Arduino-ESP32 version
 
 ## Features
 
-- **Ultra-minimal** - Uses only ESP32's hardware RMT peripheral and standard C libraries
+- **Ultra-minimal** - Uses only ESP32's hardware RMT peripheral, timer, and standard C libraries
 - **Simple API** - Just two functions: `begin()` and `set()`
 - **Hardware-based timing** - No CPU overhead for bit timing
 - **8 predefined colors** - Common colors built-in
@@ -125,7 +125,7 @@ void task2(void* param) {
 ## Requirements
 
 - **ESP32 board** (any variant with the RMT peripheral)
-- **Arduino-ESP32 core 3.3 or higher**
+- **esp32 by Espressif Systems** Arduino board library
 - **Single WS2812B LED**
 
 ## Troubleshooting
@@ -144,7 +144,7 @@ Simply change the order of the g, r, b in WS2812B.cpp here:
 ```
 
 **Compilation errors:**
-- Ensure the Arduino-ESP32 board library is version 3.3 or higher
+- Ensure the "esp32 by Espressif Systems" board library is version 3.3 or higher
 
 ## License
 
