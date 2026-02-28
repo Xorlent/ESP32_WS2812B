@@ -33,7 +33,6 @@ private:
     int64_t last_transmit_us;  // Timestamp of last transmission completion
     
     void sendData(uint8_t r, uint8_t g, uint8_t b);
-    void applyBrightness(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t brightness);
 };
 
 #endif // WS2812B_H

@@ -222,12 +222,6 @@ bool WS2812B::begin(uint8_t pin) {
     return true;
 }
 
-void WS2812B::applyBrightness(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t brightness) {
-    r = (r * brightness) / 255;
-    g = (g * brightness) / 255;
-    b = (b * brightness) / 255;
-}
-
 void WS2812B::set(const char* color, uint8_t brightness) {
     if (!initialized || !color) {
         return;
@@ -263,7 +257,9 @@ void WS2812B::set(const char* color, uint8_t brightness) {
     
     // Apply brightness adjustment
     if (brightness != 0u && brightness != 255u) {
-        applyBrightness(r, g, b, brightness);
+        r = (r * brightness) / 255u;
+        g = (g * brightness) / 255u;
+        b = (b * brightness) / 255u;
     }
     
     sendData(r, g, b);
